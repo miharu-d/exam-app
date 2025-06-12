@@ -1,18 +1,86 @@
-# app/crud/problem.py
+# backend/app/crud/problem.py
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, update
 from typing import List, Optional
-from ..schemas import problem as problem_schema
 
-dummy_db = [
-    {"id": 1, "subject": "統計学", "year": 2023, "month": 4, "question": "p値とは何か、説明してください。", "answer": "帰無仮説が真であると仮定したとき、観測されたデータ以上に極端なデータが得られる確率。"},
-    {"id": 2, "subject": "線形代数", "year": 2022, "month": 4, "question": "固有値と固有ベクトルの関係を述べてください。", "answer": "行列Aに対して、Av = λvを満たすゼロでないベクトルvが固有ベクトル、スカラーλが固有値。"},
-    {"id": 3, "subject": "統計学", "year": 2021, "month": 4, "question": "第一種の過誤と第二種の過誤の違いは？", "answer": "第一種の過誤は真である帰無仮説を棄却する誤り、第二種の過誤は偽である帰無仮説を採択する誤り。"},
-    {"id": 4, "subject": "微分積分", "year": 2023, "month": 4, "question": "テイラー展開の目的を説明してください。", "answer": "複雑な関数を、ある点の周りで多項式によって近似すること。"},
-]
+from app.models.problem import Problem
+from app.schemas.problem import ProblemCreate, ProblemUpdate # スキーマもインポート
 
-def get_problems(subject: Optional[str] = None, year: Optional[str] = None) -> List[dict]:
-    results = dummy_db
+# 問題をIDで取得
+async def get_problem(db: AsyncSession, problem_id: int):
+    result = await db.execute(select(Problem).where(
+        Problem.id == problem_id,
+        Problem.deleted_at.is_(None) # 論理削除を考慮
+    ))
+    return result.scalars().first()
+
+# 問題を複数取得（検索機能など）
+async def get_problems(
+    db: AsyncSession, 
+    subject: Optional[str] = None, 
+    year: Optional[int] = None, 
+    month: Optional[int] = None, 
+    skip: int = 0, 
+    limit: int = 100
+) -> List[Problem]:
+    query = select(Problem).where(Problem.deleted_at.is_(None)) # 論理削除を考慮
+
     if subject:
-        results = [p for p in results if subject.lower() in p["subject"].lower()]
-    if year and year.isdigit():
-        results = [p for p in results if p["year"] == int(year)]
-    return results
+        query = query.where(Problem.subject == subject)
+    if year:
+        query = query.where(Problem.year == year)
+    if month:
+        query = query.where(Problem.month == month)
+
+    result = await db.execute(query.offset(skip).limit(limit))
+    return result.scalars().all()
+
+# 問題を作成
+async def create_problem(db: AsyncSession, problem: ProblemCreate, user_id: int):
+    # created_at, updated_at はモデル定義で server_default=func.now() で自動設定される
+    db_problem = Problem(**problem.model_dump(), user_id=user_id)
+    db.add(db_problem)
+    await db.commit()
+    await db.refresh(db_problem)
+    return db_problem
+
+# 問題を更新（論理削除を含む）
+async def update_problem(db: AsyncSession, problem_id: int, problem_update: ProblemUpdate):
+    # まず対象の問題を取得
+    db_problem = await get_problem(db, problem_id)
+    if not db_problem:
+        return None # 問題が見つからない
+
+    # 更新したい属性を適用
+    for key, value in problem_update.model_dump(exclude_unset=True).items():
+        setattr(db_problem, key, value)
+    
+    # updated_at はモデル定義で onupdate=func.now() で自動更新される
+
+    await db.add(db_problem) # 変更をセッションに反映
+    await db.commit()
+    await db.refresh(db_problem)
+    return db_problem
+
+# 論理削除 (deleted_atを設定)
+async def soft_delete_problem(db: AsyncSession, problem_id: int):
+    db_problem = await get_problem(db, problem_id) # get_problemはdeleted_atがNoneのものを取得
+    if not db_problem:
+        return None
+
+    db_problem.deleted_at = func.now() # 現在時刻を設定して論理削除
+    await db.add(db_problem)
+    await db.commit()
+    await db.refresh(db_problem)
+    return db_problem
+
+# 物理削除 (テスト用など、通常のAPIでは使わない)
+async def hard_delete_problem(db: AsyncSession, problem_id: int):
+    db_problem = await db.execute(select(Problem).where(Problem.id == problem_id))
+    problem_to_delete = db_problem.scalars().first()
+    if not problem_to_delete:
+        return None
+    await db.delete(problem_to_delete)
+    await db.commit()
+    return {"message": "Problem permanently deleted"}

@@ -1,7 +1,11 @@
 # app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api import api_router # api.pyからルーターをインポート
+from app.api.endpoints import problems
+# from app.api.endpoints import users
+
+import app.models.user
+import app.models.problem
 
 app = FastAPI(title="試験問題システム API")
 
@@ -15,7 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(api_router) # APIルーターをアプリに登録
+app.include_router(problems.router, prefix="/api") # /api/problems のようにアクセス
+# app.include_router(users.router, prefix="/api") # /api/problems のようにアクセス
 
 @app.get("/")
 def read_root():
