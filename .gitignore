@@ -1,0 +1,32 @@
+# OS / Editor
+# ---------------------------------
+.DS_Store
+.vscode/
+
+# 機密情報
+# APIキーやパスワードなどを書くファイル。絶対にGitに含めない。
+# ---------------------------------
+.env
+.env.local
+.env.*.local
+
+# ログファイル
+# ---------------------------------
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+
+
+# フロントエンド (Next.js)
+# ---------------------------------
+frontend/node_modules
+frontend/.next
+frontend/out
+frontend/.swc
+
+
+# バックエンド (Python / FastAPI)
+# ---------------------------------
+backend/venv
+backend/__pycache__
+backend/*.pyc
