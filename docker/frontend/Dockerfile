@@ -10,6 +10,8 @@ RUN npm install
 
 COPY . .
 
+RUN npm run build
+
 # 本番ステージ
 FROM node:18-alpine AS production
 

@@ -2,9 +2,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import theme from '@/theme'; // 後で作成するテーマファイル
+import MuiThemeProvider from '@/providers/MuiThemeProvider';
 
 // Google FontsからRobotoを読み込む
 const roboto = Roboto({
@@ -27,11 +25,9 @@ export default function RootLayout({
     <html lang="ja">
       <body className={roboto.className}>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            {/* CssBaselineでブラウザのデフォルトスタイルをリセット */}
-            <CssBaseline />
+          <MuiThemeProvider>
             {children}
-          </ThemeProvider>
+          </MuiThemeProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

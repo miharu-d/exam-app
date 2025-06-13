@@ -1,41 +1,36 @@
-// src/app/search/page.tsx (最終版)
 "use client";
 import { useState } from 'react';
 import type { Problem, SearchCriteria } from '@/types';
-import { searchProblems } from '@/api/problems'; // 👈 API関数をインポート
+import { searchProblems } from '@/api/problems';
 import { SearchForm } from '@/components/search/SearchForm';
 import { ProblemList } from '@/components/search/ProblemList';
-import { Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box, useTheme } from '@mui/material'; // useTheme をインポート
 
 export default function SearchPage() {
-  // 初期状態は空の配列にする
     const [problems, setProblems] = useState<Problem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const theme = useTheme(); // テーマオブジェクトにアクセス
 
-    // handleSearch関数を、APIを呼び出す非同期関数に書き換える
     const handleSearch = async (criteria: SearchCriteria) => {
-        setIsLoading(true); // 検索開始！ローディング表示をON
-        setError(null);     // 古いエラーメッセージをリセット
+        setIsLoading(true);
+        setError(null);
 
         try {
-        // 実際にAPIを呼び出して結果を取得
-        const results = await searchProblems(criteria);
-        setProblems(results); // 取得した結果をstateに保存
+            const results = await searchProblems(criteria);
+            setProblems(results);
         } catch (err) {
-        // エラーが発生したらメッセージをセット
-        setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
-        setProblems([]); // エラー時は結果をクリア
+            setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
+            setProblems([]);
         } finally {
-        // 成功しても失敗しても、ローディングは終了
-        setIsLoading(false);
+            setIsLoading(false);
         }
     };
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Typography variant="h3" component="h1" gutterBottom>
+        <Container maxWidth="lg" sx={{ py: theme.spacing(4), backgroundColor: theme.palette.background.default }}>
+        <Box sx={{ textAlign: 'center', mb: theme.spacing(4), pt: theme.spacing(2) }}>
+            <Typography variant="h3" component="h1" gutterBottom color="primary.dark">
             問題検索
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
