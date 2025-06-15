@@ -4,6 +4,8 @@ import type { SearchCriteria } from '@/types';
 import { useState } from 'react';
 import { Box, TextField, Button, Grid, Paper, Select, MenuItem, InputLabel, FormControl, useTheme } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import type { SelectChangeEvent } from '@mui/material/Select'; 
+import type { ReactNode } from 'react';
 
 interface Props {
     onSearch: (criteria: SearchCriteria) => void;
@@ -16,8 +18,17 @@ export const SearchForm = ({ onSearch, isLoading }: Props) => {
 
     const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i); // 今年から過去5年
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setCriteria({ ...criteria, [e.target.name]: e.target.value });
+     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: ReactNode ) => {
+        // SelectChangeEvent の target.value は常に string なので、直接 e.target.value を使える
+        // HTMLInputElement/HTMLTextAreaElement の target.value も string
+        // SelectChangeEvent は e.target.name を持たない場合があるため、型ガードで安全にアクセス
+        const name = e.target.name || ''; // name属性がない場合も考慮
+
+        // yearの値が数値であることを保証
+        const value = name === 'year' ? Number(e.target.value) : e.target.value;
+
+        setCriteria({ ...criteria, [name]: value });
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

@@ -1,31 +1,106 @@
 // src/api/client.ts
-import axios from 'axios';
+
+import axios from "axios";
+import type { AxiosError } from "axios";
+
+interface FastAPIValidationError {
+  loc: (string | number)[];
+  msg: string;
+  type: string;
+}
+
+// FastAPIのエラーレスポンスの一般的な型を定義
+interface FastAPIErrorResponseData {
+  detail: string | FastAPIValidationError[] | object;
+}
 
 // 共通設定を持ったaxiosインスタンスを作成
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// レスポンス共通処理（インターセプター）
-// 全てのレスポンスは、ここで一度チェックされる
-apiClient.interceptors.response.use(
-  // 通信成功時の処理
-    (response) => {
-        //レスポンスデータをそのまま返す
-        return response;
-    },
-    // 通信失敗時の処理
-    (error) => {
-        // FastAPIからの詳細なエラーメッセージがあればそれを優先
-        if (error.response && error.response.data && error.response.data.detail) {
-        return Promise.reject(new Error(error.response.data.detail));
-        }
-        // それ以外はaxiosのデフォルトのエラーメッセージ
-        return Promise.reject(new Error(error.message));
+// リクエスト共通処理（インターセプター）
+apiClient.interceptors.request.use(
+  (config) => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("authToken");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
+    return config;
+  },
+  (error: AxiosError) => {
+    return Promise.reject(error);
+  }
+);
+
+// レスポンス共通処理（インターセプター）
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error: AxiosError) => {
+    if (error.response) {
+      // error.response.data が unknown 型として扱われる可能性に対応し、
+      // 型ガードで detail プロパティの存在と型を確認する
+      const responseData: unknown = error.response.data; // response.data は unknown とすることが安全
+
+      // responseData がオブジェクトであり、detail プロパティを持つことを確認
+      if (
+        typeof responseData === "object" &&
+        responseData !== null &&
+        "detail" in responseData
+      ) {
+        let errorMessage = "";
+        // detail プロパティの型を FastAPIErrorResponseData の detail に合わせる
+        const detail = (responseData as FastAPIErrorResponseData).detail;
+
+        if (Array.isArray(detail)) {
+          // バリデーションエラーのリストの場合
+          // detailの各要素がFastAPIValidationErrorの構造を持つことを前提
+          errorMessage = detail
+            .map(
+              (err: FastAPIValidationError) =>
+                `${err.loc.join(".")}: ${err.msg}`
+            )
+            .join("; ");
+        } else if (typeof detail === "object" && detail !== null) {
+          // 単なるオブジェクトの場合 (例: {"detail": "エラーメッセージ"})
+          errorMessage = JSON.stringify(detail);
+        } else if (typeof detail === "string") {
+          // 文字列の場合 (例: {"detail": "認証情報が無効です"})
+          errorMessage = detail;
+        } else {
+          // 予期しない形式の場合
+          errorMessage = "不明なAPIエラーレスポンス形式";
+        }
+
+        // ... (省略: 401 Unauthorized の処理など) ...
+
+        return Promise.reject(new Error(errorMessage));
+      } else {
+        // error.response.data.detail が存在しないが、error.response はある場合
+        // responseData がオブジェクトだが detail プロパティを持たない場合もここ
+        return Promise.reject(
+          new Error(
+            `APIエラー: ${error.response.status} ${
+              error.response.statusText || ""
+            }`
+          )
+        );
+      }
+    } else if (error.request) {
+      return Promise.reject(
+        new Error("ネットワークエラー: サーバーからの応答がありません。")
+      );
+    } else {
+      return Promise.reject(new Error(`エラー: ${error.message}`));
+    }
+  }
 );
 
 export default apiClient;

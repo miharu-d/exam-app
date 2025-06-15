@@ -1,6 +1,6 @@
 // src/components/search/ProblemCard.tsx (再掲)
 import type { Problem } from '@/types';
-import { Card, CardContent, Typography, CardActions, Button, Box, useTheme } from '@mui/material'; // useTheme もインポート
+import { Card, CardContent, Typography, CardActions, Button, useTheme } from '@mui/material'; // useTheme もインポート
 
 interface Props {
     problem: Problem;
