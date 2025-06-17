@@ -41,9 +41,4 @@ class ProblemResponse(BaseModel):
     updated_at: datetime
     deleted_at: Optional[datetime] = None
 
-    # Pydantic v2 の場合:
     model_config = ConfigDict(from_attributes=True) # ORM Mode の代わりに from_attributes を使用
-
-    # Pydantic v1 の場合 (もし使用しているなら):
-    # class Config:
-    #     orm_mode = True

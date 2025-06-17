@@ -5,13 +5,13 @@ from sqlalchemy import select, update
 from typing import List, Optional
 
 from app.models.problem import Problem
-from app.schemas.problem import ProblemCreate, ProblemUpdate # スキーマもインポート
+from app.schemas.problem import ProblemCreate, ProblemUpdate
 
 # 問題をIDで取得
 async def get_problem(db: AsyncSession, problem_id: int):
     result = await db.execute(select(Problem).where(
         Problem.id == problem_id,
-        Problem.deleted_at.is_(None) # 論理削除を考慮
+        Problem.deleted_at.is_(None)
     ))
     return result.scalars().first()
 
@@ -24,7 +24,7 @@ async def get_problems(
     skip: int = 0, 
     limit: int = 100
 ) -> List[Problem]:
-    query = select(Problem).where(Problem.deleted_at.is_(None)) # 論理削除を考慮
+    query = select(Problem).where(Problem.deleted_at.is_(None))
 
     if subject:
         query = query.where(Problem.subject == subject)

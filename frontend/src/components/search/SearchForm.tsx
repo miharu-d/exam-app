@@ -16,16 +16,11 @@ export const SearchForm = ({ onSearch, isLoading }: Props) => {
     const [criteria, setCriteria] = useState<SearchCriteria>({ subject: '', year: '' });
     const theme = useTheme();
 
-    const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i); // 今年から過去5年
+    const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i);
 
      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: ReactNode ) => {
-        // SelectChangeEvent の target.value は常に string なので、直接 e.target.value を使える
-        // HTMLInputElement/HTMLTextAreaElement の target.value も string
-        // SelectChangeEvent は e.target.name を持たない場合があるため、型ガードで安全にアクセス
-        const name = e.target.name || ''; // name属性がない場合も考慮
-
-        // yearの値が数値であることを保証
+        const name = e.target.name || '';
         const value = name === 'year' ? Number(e.target.value) : e.target.value;
 
         setCriteria({ ...criteria, [name]: value });
@@ -40,8 +35,7 @@ export const SearchForm = ({ onSearch, isLoading }: Props) => {
         <Paper elevation={2} sx={{ p: { xs: theme.spacing(2), sm: theme.spacing(4) }, mb: theme.spacing(4) }}>
             <Box component="form" onSubmit={handleSubmit}>
                 <Grid container spacing={3} alignItems="center">
-                    {/* 科目入力フィールド */}
-                    <Grid item xs={12} sm={5}> {/* component="div" は削除済み。必要なら後で追加 */}
+                    <Grid item xs={12} sm={5}>
                         <Box component="div">
                             <TextField
                             fullWidth
@@ -53,8 +47,7 @@ export const SearchForm = ({ onSearch, isLoading }: Props) => {
                             />
                         </Box>
                     </Grid>
-                    {/* 年度選択フィールド */}
-                    <Grid item xs={12} sm={5}> {/* component="div" は削除済み。必要なら後で追加 */}
+                    <Grid item xs={12} sm={5}>
                         <Box component="div">
                         <FormControl fullWidth variant="outlined">
                             <InputLabel id="year-select-label">年度</InputLabel>
@@ -74,8 +67,7 @@ export const SearchForm = ({ onSearch, isLoading }: Props) => {
                         </FormControl>
                         </Box>
                     </Grid>
-                    {/* 検索ボタン */}
-                    <Grid item xs={12} sm={2}> {/* component="div" は削除済み。必要なら後で追加 */}
+                    <Grid item xs={12} sm={2}>
                         <Box component="div">
                         <Button
                         fullWidth

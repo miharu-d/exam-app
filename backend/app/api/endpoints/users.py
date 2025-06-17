@@ -29,7 +29,7 @@ async def create_new_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     user_in_db = UserCreate(
         username=user.username,
         email=user.email,
-        password=hashed_password # ★ハッシュ化されたパスワードを渡す
+        password=hashed_password # ハッシュ化されたパスワードを渡す
         )
     new_user = await crud_user.create_user(db=db, user=user_in_db)
     return new_user

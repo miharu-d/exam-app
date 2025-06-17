@@ -3,21 +3,19 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
-from jose import JWTError, jwt # pip install python-jose[cryptography] が必要
+from jose import JWTError, jwt
 
-from app.db.base import SessionLocal # get_db は依存性注入で使われるので不要
-from app.crud import user as crud_user # ユーザーCRUD操作
+from app.db.base import SessionLocal
+from app.crud import user as crud_user
 from app.schemas.token import Token, TokenData
 from app.schemas.user import UserResponse
 from app.core.security import verify_password, get_password_hash # パスワードユーティリティ
-from app.core.config import settings # 設定
+from app.core.config import settings
 
 # JWTトークン検証用の秘密鍵とアルゴリズム
-SECRET_KEY = settings.SECRET_KEY # settings.pyから取得
+SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = "HS256" # JWTのアルゴリズム
 
-# OAuth2パスワードベアラーの定義
-# tokenUrl はログインAPIのパスを指定
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
 
 router = APIRouter()
@@ -27,13 +25,13 @@ async def get_db():
     async with SessionLocal() as session:
         yield session
 
-# JWTトークンを作成するヘルパー関数
+# JWTトークンを作成
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-# JWTトークンを検証し、現在のユーザーを返す関数
+# JWTトークンを検証し、現在のユーザーを返す
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -49,7 +47,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     except JWTError:
         raise credentials_exception
     
-    # ユーザー名でユーザーを取得
+    # メールアドレスでユーザーを取得
     user = await crud_user.get_user_by_email(db, email=token_data.username)
     if user is None:
         raise credentials_exception

@@ -2,10 +2,10 @@
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 from datetime import datetime
-from typing import Optional, List # List をインポート
+from typing import Optional, List
 
 # Userモデルの型情報を更新
-from app.models.problem import Problem # Problemモデルをインポート（後でリレーションシップ表示用）
+from app.models.problem import Problem # Problemモデルをインポート（リレーションシップ表示用）
 
 # ユーザー作成時のリクエストボディ
 class UserCreate(BaseModel):
@@ -31,10 +31,4 @@ class UserResponse(BaseModel):
     updated_at: datetime
     deleted_at: Optional[datetime] = None
 
-    # このユーザーが作成した問題のリストを含める場合
-    # ProblemResponse スキーマが別途必要
-    # from app.schemas.problem import ProblemResponse
-    # problems: List[ProblemResponse] = [] # 空のリストをデフォルトに
-
-    # Pydantic v2 の場合:
     model_config = ConfigDict(from_attributes=True) # ORM Mode の代わりに from_attributes を使用

@@ -23,20 +23,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoadingAuth, setIsLoadingAuth] = useState(true);
     const router = useRouter();
 
-    // ログアウト処理 (useCallback の依存性には router のみでOK)
+    // ログアウト処理
     const logout = useCallback(() => {
         localStorage.removeItem('authToken');
         setToken(null);
         setUser(null);
         router.push('/login');
-    }, [router]); // ★fetchUser を削除★
-
-  // fetchUser は useCallback でラップされているので、ここでは依存性配列に含める
-  // 循環参照に見えるが、useCallback が依存性を正しく管理するため問題ない
-  // ただし、もし fetchUser の定義が AuthProvider の外にあるなら話は別だが、ここでは内側にある
-  // そのため、useEffect の依存性配列に fetchUser を含めるのは正解
-  // ESLint が言う 'missing dependency' は 'fetchUser' が外で定義されているように見えるため
-  // ここでは fetchUser を依存性に追加し、ESLintの警告を解消する
+    }, [router]);
 
   // ユーザー情報をフェッチする関数 (useCallback の依存性に logout を追加)
     const fetchUser = useCallback(async (authToken: string) => {
@@ -49,9 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout();
         setIsLoadingAuth(false);
         }
-    }, [logout]); // ★logout を依存性配列に追加★
+    }, [logout]);
 
-    // トークンをLocalStorageからロード (useEffect の依存性に fetchUser を追加)
+    // トークンをLocalStorageからロード
     useEffect(() => {
         const storedToken = localStorage.getItem('authToken');
         if (storedToken) {
@@ -60,9 +53,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
         setIsLoadingAuth(false);
         }
-    }, [fetchUser]); // ★fetchUser を依存性配列に追加★
+    }, [fetchUser]);
 
-    // ログイン処理 (useCallback の依存性から fetchUser を削除)
+    // ログイン処理
     const login = useCallback(async (credentials: LoginRequest) => {
         setIsLoadingAuth(true);
         try {
@@ -78,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } finally {
         setIsLoadingAuth(false);
         }
-    }, [router, logout, fetchUser]); // ★fetchUser は必要、ただし loginUser 自体はfetchUserに依存しない
+    }, [router, logout, fetchUser]);
 
     const isAuthenticated = !!token && !!user;
 

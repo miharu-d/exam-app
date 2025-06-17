@@ -4,15 +4,14 @@ import type { Problem, SearchCriteria } from '@/types';
 import { searchProblems } from '@/api/problems';
 import { SearchForm } from '@/components/search/SearchForm';
 import { ProblemList } from '@/components/search/ProblemList';
-import { Container, Typography, Box, useTheme } from '@mui/material'; // useTheme をインポート
+import { Container, Typography, Box, useTheme } from '@mui/material';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 
 export default function SearchPage() {
     const [problems, setProblems] = useState<Problem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const theme = useTheme(); // テーマオブジェクトにアクセス
-
+    const theme = useTheme();
     const handleSearch = async (criteria: SearchCriteria) => {
         setIsLoading(true);
         setError(null);

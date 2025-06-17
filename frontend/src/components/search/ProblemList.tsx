@@ -1,7 +1,6 @@
-// src/components/search/ProblemList.tsx (改訂版)
+// src/components/search/ProblemList.tsx
 import type { Problem } from '@/types';
 import { ProblemCard } from './ProblemCard';
-// Gridの代わりにStackなどをインポートします
 import { Box, CircularProgress, Alert, Typography, Stack } from '@mui/material';
 
 interface Props {
@@ -22,9 +21,7 @@ export const ProblemList = ({ problems, isLoading, error }: Props) => {
     if (problems.length === 0) {
         return <Typography sx={{ textAlign: 'center', my: 4 }}>条件に合う問題が見つかりませんでした。</Typography>;
     }
-
-    // 以前のGridコンポーネントを、Stackコンポーネントに置き換えます
-    // spacing={3}で、各カードの間に程よい余白ができます
+    
     return (
         <Stack spacing={3}>
         {problems.map((problem) => (
