@@ -57,3 +57,21 @@ export interface ProblemUpdate {
     explanation?: string;
     deleted_at?: string | null;
 }
+
+// ログイン
+export interface LoginRequest {
+    email: string;
+    password: string;
+}
+
+// token
+export interface AuthToken {
+    access_token: string;
+    token_type: string;
+}
+
+// userレスポンス
+export interface User {
+    id: number;
+    username: string;
+}

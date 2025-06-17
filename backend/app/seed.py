@@ -7,6 +7,7 @@ import random
 from app.db.base import SessionLocal
 from app.models.problem import Problem
 from app.models.user import User
+from app.core.security import get_password_hash
 
 # 投入したい初期データ (ユーザー)
 initial_users_data = [
@@ -104,10 +105,11 @@ async def seed_data():
         created_users = []
         for user_data in initial_users_data:
             now = func.now()
+            hashed_password = get_password_hash(user_data["hashed_password"])
             db_user = User(
                 username=user_data["username"],
                 email=user_data["email"],
-                hashed_password=user_data["hashed_password"],
+                hashed_password=hashed_password,
                 is_active=user_data["is_active"],
                 created_at=now,
                 updated_at=now,
