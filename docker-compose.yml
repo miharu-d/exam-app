@@ -1,12 +1,12 @@
-# docker-compose.yml (改訂版)
+# docker-compose.yml
 version: '3.8'
 
 services:
-  # バックエンドサービス
+  # バックエンド
   backend:
     build:
-      context: ./backend  # 1. ビルドの基準となる場所はここ（変更なし）
-      dockerfile: ../docker/backend/Dockerfile # 2. Dockerfileの場所を明示的に指定
+      context: ./backend  # 1. ビルドの基準となる場所
+      dockerfile: ../docker/backend/Dockerfile # 2. Dockerfileの場所
     container_name: exam_app_backend
     ports:
       - "8000:8000"
@@ -17,11 +17,11 @@ services:
     depends_on:
       - db
 
-  # フロントエンドサービス
+  # フロントエンド
   frontend:
     build:
-      context: ./frontend # 1. ビルドの基準となる場所はここ（変更なし）
-      dockerfile: ../docker/frontend/Dockerfile # 2. Dockerfileの場所を明示的に指定
+      context: ./frontend # 1. ビルドの基準となる場所
+      dockerfile: ../docker/frontend/Dockerfile # 2. Dockerfileの場所
     container_name: exam_app_frontend
     ports:
       - "3000:3000"
@@ -36,7 +36,7 @@ services:
       - backend
     command: npm run dev
 
-  # データベースサービス (変更なし)
+  # データベース
   db:
     image: postgres:15-alpine
     container_name: exam_db_postgres
