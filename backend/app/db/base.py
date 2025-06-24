@@ -10,7 +10,8 @@ engine = create_async_engine(settings.DATABASE_URL, echo=True)
 # データベースセッションを作成するためのクラス
 SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = DeclarativeBase()
+class Base(DeclarativeBase):
+    pass
 
 # FastAPIの依存性注入でデータベースセッションを提供するための関数
 async def get_db():

@@ -12,6 +12,7 @@ from app.schemas.user import UserResponse, UserCreate
 from app.core.security import create_access_token, verify_password, get_password_hash
 from app.core.config import settings
 from app.models.user import User as UserModel
+from datetime import timedelta
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
 
@@ -55,9 +56,10 @@ async def login_for_access_token(
         )
 
     # settingsからトークンの有効期限を取得し、create_access_token に渡す
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": str(user.id)},
-        expires_delta=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 

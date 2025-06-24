@@ -9,11 +9,15 @@ export async function loginUser(credetials: LoginRequest): Promise<AuthToken> {
   formBody.append("password", credetials.password);
 
   try {
-    const response = await apiClient.post<AuthToken>("/api/token", formBody, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const response = await apiClient.post<AuthToken>(
+      "/api/auth/token",
+      formBody,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     return response.data;
   } catch (err) {
@@ -24,7 +28,7 @@ export async function loginUser(credetials: LoginRequest): Promise<AuthToken> {
 
 export async function fetchCurrentUser(token: string): Promise<User> {
   try {
-    const response = await apiClient.get<User>("/api/users/me", {
+    const response = await apiClient.get<User>("/api/auth/users/me", {
       headers: {
         Authrization: `Bearer ${token}`,
       },

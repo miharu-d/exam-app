@@ -1,14 +1,17 @@
 # backend/app/core/config.py
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings,SettingsConfigDict
+from pydantic import Field
 
 class Settings(BaseSettings):
-    DATABASE_URL: str
-    SECRET_KEY: str = "exam-test-app-key"
-    ALGORITHM: str = "HS256"
-    API_V1_STR: str = "/api/v1"
+    SECRET_KEY: str = Field(..., description="JWT Secret Key")
+    ALGORITHM: str = Field(..., description="JWT Algorithm")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(..., description="Access token expiration minutes")
+    API_V1_STR: str = Field(..., description="API Version String")
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = 'utf-8'
+    DATABASE_URL: str = Field(..., description="Database connection URL")
+
+    APP_ENV: str = Field(..., description="Application environment (e.g., development, production)")
+
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
 
 settings = Settings()

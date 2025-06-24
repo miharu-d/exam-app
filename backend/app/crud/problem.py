@@ -14,7 +14,7 @@ async def get_problem(db: AsyncSession, problem_id: int, user_id: int) -> Option
     result = await db.execute(select(Problem).where(
         Problem.id == problem_id,
         Problem.deleted_at.is_(None),
-        Problem.user_id = user_id
+        Problem.user_id == user_id
     ))
     return result.scalars().first()
 
