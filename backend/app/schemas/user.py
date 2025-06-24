@@ -19,7 +19,6 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     password: Optional[str] = None # パスワード更新用
     is_active: Optional[bool] = None
-    # hashed_password は直接更新させない
 
 # APIレスポンスとして返すユーザー情報（パスワードなし）
 class UserResponse(BaseModel):
@@ -30,5 +29,4 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
-
     model_config = ConfigDict(from_attributes=True) # ORM Mode の代わりに from_attributes を使用

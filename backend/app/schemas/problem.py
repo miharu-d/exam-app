@@ -40,5 +40,4 @@ class ProblemResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
-
     model_config = ConfigDict(from_attributes=True) # ORM Mode の代わりに from_attributes を使用

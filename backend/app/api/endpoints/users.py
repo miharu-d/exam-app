@@ -8,12 +8,12 @@ from app.db.base import SessionLocal
 from app.crud import user as crud_user
 from app.schemas.user import UserCreate, UserResponse
 from app.core.security import get_password_hash
+from app.db.base import get_db
+from app.api.endpoints.auth import get_current_user
 
-router = APIRouter()
-
-async def get_db():
-    async with SessionLocal() as session:
-        yield session
+router = APIRouter(
+    tags=["Users"],
+)
 
 # 新しいユーザーを登録するAPIエンドポイント
 @router.post("/users/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
