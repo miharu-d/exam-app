@@ -1,13 +1,9 @@
-# app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.base import Base, engine
 from app.api.endpoints import problems
 from app.api.endpoints import auth
 from app.api.endpoints import users
-
-import app.models.user
-import app.models.problem
 
 app = FastAPI(title="試験問題システム API")
 

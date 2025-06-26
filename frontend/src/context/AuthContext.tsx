@@ -1,13 +1,10 @@
-// src/context/AuthContext.tsx
 "use client";
-
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import type { User, LoginRequest } from '@/types';
-import { loginUser, fetchCurrentUser } from '@/api/auth';
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import type { User, LoginRequest } from '@/types/user';
+import { loginUser, logoutUser } from '@/api/auth';
 import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
-    token: string | null;
     user: User | null;
     isAuthenticated: boolean;
     login: (credentials: LoginRequest) => Promise<void>;
@@ -17,72 +14,57 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [token, setToken] = useState<string | null>(null);
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+export function AuthProvider({ children, initialUser }: { children: React.ReactNode, initialUser: User | null }) {
+    const [user, setUser] = useState<User | null>(initialUser);
+    const [isLoadingAuth, setIsLoadingAuth] = useState(false);
     const router = useRouter();
 
-    // ログアウト処理
-    const logout = useCallback(() => {
-        localStorage.removeItem('authToken');
-        setToken(null);
-        setUser(null);
-        router.push('/login');
-    }, [router]);
-
-  // ユーザー情報をフェッチする関数 (useCallback の依存性に logout を追加)
-    const fetchUser = useCallback(async (authToken: string) => {
-        try {
-        const currentUser = await fetchCurrentUser(authToken);
-        setUser(currentUser);
-        setIsLoadingAuth(false);
-        } catch (error) {
-        console.error("Failed to fetch user data:", error);
-        logout();
-        setIsLoadingAuth(false);
-        }
-    }, [logout]);
-
-    // トークンをLocalStorageからロード
-    useEffect(() => {
-        const storedToken = localStorage.getItem('authToken');
-        if (storedToken) {
-        setToken(storedToken);
-        fetchUser(storedToken);
-        } else {
-        setIsLoadingAuth(false);
-        }
-    }, [fetchUser]);
-
-    // ログイン処理
     const login = useCallback(async (credentials: LoginRequest) => {
         setIsLoadingAuth(true);
         try {
-        const authToken = await loginUser(credentials);
-        localStorage.setItem('authToken', authToken.access_token);
-        setToken(authToken.access_token);
-        await fetchUser(authToken.access_token);
-        router.push('/search');
-        } catch (error) {
-        console.error("Login failed:", error);
-        logout();
-        throw error;
-        } finally {
-        setIsLoadingAuth(false);
-        }
-    }, [router, logout, fetchUser]);
+            // loginUserを呼び出し、ユーザー情報を直接受け取る
+            const loggedInUser = await loginUser(credentials);
+            
+            // 受け取ったユーザー情報でContextの状態を更新
+            setUser(loggedInUser);
 
-    const isAuthenticated = !!token && !!user;
+            // 遷移
+            router.push('/problems');
+        } catch (error) {
+            console.error("Login failed:", error);
+            setUser(null);
+            throw error;
+        } finally {
+            setIsLoadingAuth(false);
+        }
+    }, [router]);
+
+
+    const logout = useCallback(async () => {
+        setIsLoadingAuth(true);
+        try {
+            await logoutUser(); // バックエンドでCookieを削除
+            setUser(null); // Contextの状態をクリア
+            router.push('/login');
+            // router.refresh()を呼ぶと、サーバーコンポーネントの状態も確実に更新される
+            router.refresh(); 
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            setIsLoadingAuth(false);
+        }
+    }, [router]);
+
+    const isAuthenticated = !!user;
 
     return (
-        <AuthContext.Provider value={{ token, user, isAuthenticated, login, logout, isLoadingAuth }}>
-        {children}
+        <AuthContext.Provider value={{ user, isAuthenticated, login, logout, isLoadingAuth }}>
+            {children}
         </AuthContext.Provider>
     );
-    }
+}
 
-    export const useAuth = () => {
+export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {
         throw new Error('useAuth must be used within an AuthProvider');

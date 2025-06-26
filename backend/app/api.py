@@ -1,4 +1,3 @@
-# app/api.py
 from fastapi import APIRouter
 from .routes import problems
 

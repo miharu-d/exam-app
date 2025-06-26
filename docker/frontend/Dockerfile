@@ -1,5 +1,3 @@
-# frontend/Dockerfile
-
 # 開発ステージ
 FROM node:18-alpine AS development
 

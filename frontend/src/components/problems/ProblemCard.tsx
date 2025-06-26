@@ -1,6 +1,7 @@
-// src/components/search/ProblemCard.tsx
-import type { Problem } from '@/types';
+"use client";
+import type { Problem } from '@/types/problem';
 import { Card, CardContent, Typography, CardActions, Button, useTheme } from '@mui/material';
+import Link from 'next/link';
 
 interface Props {
     problem: Problem;
@@ -33,9 +34,18 @@ export const ProblemCard = ({ problem }: Props) => {
             </Typography>
         </CardContent>
         <CardActions sx={{ justifyContent: 'flex-end', px: theme.spacing(2), pb: theme.spacing(2) }}>
-            <Button size="small" variant="contained" color="secondary">
-                解答を見る
-            </Button>
+            {
+                <Button 
+                    size="small" 
+                    variant="contained" 
+                    color="secondary"
+                    component={Link} // Linkコンポーネントとしてレンダリング
+                    href={`/problems/${problem.id}`}
+                    passHref // hrefを子要素に渡す
+                >
+                    詳細画面へ
+                </Button>
+            }
         </CardActions>
         </Card>
     );

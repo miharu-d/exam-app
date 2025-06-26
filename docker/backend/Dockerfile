@@ -1,5 +1,3 @@
-# backend/Dockerfile
-
 # Python 3.9をベースイメージとして使用
 FROM python:3.9-slim
 
