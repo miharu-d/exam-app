@@ -1,5 +1,3 @@
-# backend/app/schemas/problem.py
-
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
@@ -23,7 +21,7 @@ class ProblemUpdate(BaseModel):
     answer: Optional[str] = None
     hint: Optional[str] = None
     explanation: Optional[str] = None
-    deleted_at: Optional[datetime] = None # 論理削除用
+    deleted_at: Optional[datetime] = None
 
 # APIレスポンスとして返す問題のデータ構造
 # ORMモードを有効にすることで、SQLAlchemyモデルのインスタンスから自動でPydanticモデルに変換される
@@ -40,5 +38,4 @@ class ProblemResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     deleted_at: Optional[datetime] = None
-
-    model_config = ConfigDict(from_attributes=True) # ORM Mode の代わりに from_attributes を使用
+    model_config = ConfigDict(from_attributes=True)

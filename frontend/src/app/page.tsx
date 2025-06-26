@@ -1,8 +1,7 @@
 "use client";
-// frontend/app/page.tsx
 import { Typography, Container, Button } from '@mui/material';
 import Link from 'next/link';
-import { useAuth } from '@/context/AuthContext'; // 認証コンテキストをインポート
+import { useAuth } from '@/context/AuthContext';
 
 export default function HomePage() {
     const { isAuthenticated, user } = useAuth();
@@ -16,7 +15,7 @@ export default function HomePage() {
                 過去の試験問題を検索して、学習に役立てましょう。
             </Typography>
             {isAuthenticated && user ? (
-                <Button variant="contained" color="primary" component={Link} href="/search">
+                <Button variant="contained" color="primary" component={Link} href="/problems">
                     問題検索へ
                 </Button>
             ) : (

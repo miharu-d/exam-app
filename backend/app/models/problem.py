@@ -1,10 +1,8 @@
-# backend/app/models/problem.py
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 class Problem(Base):
-    # データベース上でのテーブル名を "problems" に設定
     __tablename__ = "problems"
     id = Column(Integer, primary_key=True)
     subject = Column(String(255), index=True)

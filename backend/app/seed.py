@@ -147,7 +147,7 @@ async def seed_data():
                     subject=p_data["subject"],
                     year=random.randint(2020, 2024),
                     month=random.choice(ALLOWED_MONTHS),
-                    question=f"{p_data['question']} (作成者: {user.username}, No.{i+1})",
+                    question=f"{p_data['question']}",
                     answer=p_data["answer"],
                     hint=f"これはヒントです。({p_data['subject']})",
                     explanation=f"これは解説です。詳細な説明が入ります。({p_data['subject']})",

@@ -27,6 +27,6 @@ frontend/.swc
 
 # バックエンド (Python / FastAPI)
 # ---------------------------------
-backend/venv
-backend/__pycache__
-backend/*.pyc
+venv/
+__pycache__/
+*.pyc

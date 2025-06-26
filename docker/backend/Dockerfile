@@ -1,5 +1,3 @@
-# backend/Dockerfile
-
 # Python 3.9をベースイメージとして使用
 FROM python:3.9-slim
 
@@ -15,7 +13,7 @@ RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 # アプリケーションのコードをコンテナにコピー
 COPY ./app /app/app
 
-# アプリケーションがリッスンするポートを指定
+# アプリケーションのポートを指定
 EXPOSE 8000
 
 # アプリケーションを起動するコマンド
