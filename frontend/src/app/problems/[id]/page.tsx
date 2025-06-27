@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation'; 
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { fetchProblemById } from '@/api/problems';
@@ -14,14 +15,16 @@ type Props = {
 
 export default async function ProblemDetailPage({ params }: Props) {
     const token = cookies().get('authToken')?.value;
-    const problemId = parseInt(params.id, 10);
+    if (!token) {
+        redirect('/login');
+    }
 
+    const problemId = parseInt(params.id, 10);
     if (isNaN(problemId)) {
         notFound();
     }
-
-    const problem = await fetchProblemById(problemId, token);
-
+    
+    const { data: problem } = await fetchProblemById(problemId, token);
     if (!problem) {
         notFound();
     }

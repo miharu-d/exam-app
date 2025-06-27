@@ -2,30 +2,42 @@ import type { Problem, SearchCriteria } from "@/types/problem";
 import apiClient from "./client";
 import { isAxiosError, type AxiosRequestConfig } from "axios";
 
+type ApiResponse<T> = {
+  data: T | null;
+  error: Error | null;
+};
+
 export const searchProblems = async (
   criteria: SearchCriteria,
   token?: string
-): Promise<Problem[]> => {
+): Promise<ApiResponse<Problem[]>> => {
   const config: AxiosRequestConfig = {
     params: new URLSearchParams(criteria as Record<string, string>),
   };
   if (token) {
     config.headers = { Authorization: `Bearer ${token}` };
   }
-  const response = await apiClient.get<Problem[]>("/api/problems", config);
-  return response.data;
+
+  try {
+    const response = await apiClient.get<Problem[]>("/api/problems", config);
+    // 成功した場合は、dataを返し、errorはnull
+    return { data: response.data, error: null };
+  } catch (err) {
+    // 失敗した場合は、dataはnullで、errorオブジェクトを返す
+    return {
+      data: null,
+      error: err instanceof Error ? err : new Error("Unknown API error"),
+    };
+  }
 };
 
 export const fetchProblemById = async (
   id: number,
   token?: string
-): Promise<Problem | null> => {
+): Promise<ApiResponse<Problem>> => {
   const config: AxiosRequestConfig = {};
-  // もしトークンが渡されたら、Authorizationヘッダーにセット
   if (token) {
-    config.headers = {
-      Authorization: `Bearer ${token}`,
-    };
+    config.headers = { Authorization: `Bearer ${token}` };
   }
 
   try {
@@ -33,12 +45,17 @@ export const fetchProblemById = async (
       `/api/problems/${id}`,
       config
     );
-    return response.data;
+    // 成功
+    return { data: response.data, error: null };
   } catch (error) {
+    // 404の場合は、エラーではなく「データなし」として扱う
     if (isAxiosError(error) && error.response?.status === 404) {
-      return null;
+      return { data: null, error: null };
     }
-    console.error(`Failed to fetch problem with ID ${id}:`, error);
-    throw error;
+    // その他のエラー
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error("Unknown API error"),
+    };
   }
 };
