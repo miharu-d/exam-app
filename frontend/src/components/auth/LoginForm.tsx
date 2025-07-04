@@ -1,23 +1,24 @@
 "use client";
 import { useState } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useTheme } from '@mui/material/styles';
 import { Box, TextField, Button, Typography, Container, Paper, Alert }  from '@mui/material'; 
 import { useAuth } from '@/context/AuthContext';
+import type { LoginRequest } from '@/types/user'; 
 
 export default function LoginForm() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const theme = useTheme();
-
     const { login, isLoadingAuth } = useAuth();
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setError(null);
+    // 初期化
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>();
 
+    // フォーム送信時の処理
+    const onSubmit: SubmitHandler<LoginRequest> = async (data) => {
+        setError(null);
         try {
-            await login({ email, password });
+            await login(data);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'ログイン情報が正しくありません。');
         }
@@ -30,32 +31,32 @@ export default function LoginForm() {
                     ログイン
                 </Typography>
 
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt:1 ,width: '100%'}} >
+                <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt:1 ,width: '100%'}} >
                     <TextField
                         margin="normal"
                         required
                         fullWidth
                         id="email"
-                        name="username"
                         label="メールアドレス"
                         autoComplete="email"
                         autoFocus
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
                         variant="outlined"
+                        {...register("email", { required: "メールアドレスは必須です。"})}
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
                     />
                     <TextField 
                         margin="normal"
                         required
                         fullWidth
-                        name="password"
                         label="パスワード"
                         type="password"
                         id="password"
                         autoComplete="current-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
                         variant="outlined"
+                        {...register("password", { required: "パスワードは必須です" })}
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
                     />
                     {error && (
                         <Alert severity="error" sx={{ mt: 2, mb: 2}} >

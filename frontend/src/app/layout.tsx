@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { Container } from '@mui/material';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
 import MuiThemeProvider from '@/providers/MuiThemeProvider';
 import { AuthProvider } from "@/context/AuthContext";
+import { FlashMessageProvider } from '@/context/FlashMessageContext';
 import { Header } from "@/components/layout/Header";
-import { getServerUser } from "@/lib/auth/session";
+import { FlashMessage } from '@/components/ui/FlashMessage';
+import { getServerUser } from '@/lib/auth/session';
+import type { Metadata } from "next";
+import { Roboto } from "next/font/google";
 
-// Google FontsからRobotoを読み込む
 const roboto = Roboto({
     weight: ['300', '400', '500', '700'],
     subsets: ['latin'],
@@ -30,12 +32,17 @@ export default async function RootLayout({
             <body className={roboto.className}>
                 <AppRouterCacheProvider>
                     <MuiThemeProvider>
-                        <AuthProvider initialUser={initialUser}>
-                            <Header />
-                            <main>
-                                {children}
-                            </main>
-                        </AuthProvider>
+                        <FlashMessageProvider>
+                            <AuthProvider initialUser={initialUser}>
+                                <Header />
+                                <main>
+                                    <Container maxWidth="lg" sx={{ mt: 2 }}>
+                                        <FlashMessage />
+                                    </Container>
+                                    {children}
+                                </main>
+                            </AuthProvider>
+                        </FlashMessageProvider>
                     </MuiThemeProvider>
                 </AppRouterCacheProvider>
             </body>

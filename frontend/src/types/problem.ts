@@ -9,7 +9,7 @@ export interface Problem {
   hint: string | null;
   explanation: string | null;
   user_id: number;
-  created_at: string; // PythonのdatetimeはJSONでは文字列として送られる
+  created_at: string;
   updated_at: string;
   deleted_at: string | null;
 }
@@ -37,8 +37,8 @@ export interface ProblemUpdate {
   year?: number;
   month?: number;
   question?: string;
-  answer?: string;
-  hint?: string;
-  explanation?: string;
+  answer?: string | null;
+  hint?: string | null;
+  explanation?: string | null;
   deleted_at?: string | null;
 }

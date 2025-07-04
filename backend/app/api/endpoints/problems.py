@@ -1,3 +1,4 @@
+import logging;
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
@@ -59,3 +60,19 @@ async def get_problem_by_id(
     if not problem:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ご指定の問題が見つかりませんでした。")
     return problem
+
+@router.put("/{problem_id}", response_model=ProblemResponse, summary="問題データの更新")
+async def update_problem_by_id(
+    problem_id: int,
+    problem: ProblemUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: UserModel = Depends(get_current_user)
+):
+    user_id = current_user.id
+    result = await crud_problem.update_problem(db, problem_id, problem, user_id)
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="指定された問題が見つからないか、更新する権限がありません",
+        )
+    return result

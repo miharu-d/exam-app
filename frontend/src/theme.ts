@@ -89,7 +89,7 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: "12px", // カードやフォームの角を丸く
+          // borderRadius: "12px", // カードやフォームの角を丸く
           boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.05)", // 影を柔らかく
         },
       },

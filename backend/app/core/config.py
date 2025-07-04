@@ -11,7 +11,8 @@ class Settings(BaseSettings):
 
     APP_ENV: str = Field(..., description="Application environment (e.g., development, production)")
 
-    
+    # 開発環境はFalse
+    COOKIE_SECURE: bool = False 
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
 
