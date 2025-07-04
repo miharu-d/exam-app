@@ -1,4 +1,4 @@
-import type { Problem, SearchCriteria } from "@/types/problem";
+import type { Problem, ProblemUpdate, SearchCriteria } from "@/types/problem";
 import apiClient from "./client";
 import { isAxiosError, type AxiosRequestConfig } from "axios";
 
@@ -58,4 +58,22 @@ export const fetchProblemById = async (
       error: error instanceof Error ? error : new Error("Unknown API error"),
     };
   }
+};
+
+export const updateProblem = async (
+  id: number,
+  problemData: ProblemUpdate,
+  token: string
+): Promise<Problem> => {
+  const config: AxiosRequestConfig = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const { data } = await apiClient.put<Problem>(
+    `/api/problems/${id}`,
+    problemData,
+    config
+  );
+  return data;
 };

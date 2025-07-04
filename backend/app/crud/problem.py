@@ -50,3 +50,36 @@ async def create_problem(db: AsyncSession, problem: ProblemCreate, user_id: int)
     await db.commit()
     await db.refresh(db_problem)
     return db_problem
+
+async def update_problem(
+    db: AsyncSession, 
+    problem_id: int, 
+    problem_update: ProblemUpdate, 
+    user_id: int
+) -> Optional[Problem]:
+    # 更新対象の問題が存在するか
+    db_problem = await get_problem(db=db, problem_id=problem_id, user_id=user_id)
+    
+    # 問題が存在しない場合は、Noneを返して処理を終了
+    if not db_problem:
+        return None
+
+    # 更新するデータをPydanticモデルから辞書に変換
+    update_data = problem_update.dict(exclude_unset=True)
+    
+    # 更新日時を現在の時刻に設定
+    update_data["updated_at"] = datetime.now()
+
+    # SQLAlchemyのupdateステートメントを構築して実行
+    stmt = (
+        update(Problem)
+        .where(Problem.id == problem_id, Problem.user_id == user_id)
+        .values(**update_data)
+    )
+    await db.execute(stmt)
+    await db.commit()
+    
+    # データベースの最新の状態で、セッション内のオブジェクトを更新
+    await db.refresh(db_problem)
+    
+    return db_problem
