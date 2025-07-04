@@ -12,7 +12,7 @@ export const ProblemCard = ({ problem }: Props) => {
 
     return (
         <Card variant="outlined" sx={{ 
-            borderRadius: theme.shape.borderRadius * 2,
+            borderRadius: theme.shape.borderRadius / 2,
             boxShadow: theme.shadows[3],
             '&:hover': { 
                 transform: 'translateY(-3px)', 

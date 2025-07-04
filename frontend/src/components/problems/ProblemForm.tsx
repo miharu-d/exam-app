@@ -32,7 +32,9 @@ export const ProblemForm = ({ onSubmit, defaultValues, isLoading, formError, for
         defaultValues: defaultValues || {},
     });
 
-    const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
+    const currentYear = new Date().getFullYear();
+    const startYear = 1900;
+    const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i);
 
     return (
         <Paper elevation={3} sx={{ p: 4 }}>
@@ -52,7 +54,10 @@ export const ProblemForm = ({ onSubmit, defaultValues, isLoading, formError, for
                             fullWidth
                             label="科目名"
                             variant="outlined"
-                            {...register("subject", { required: "科目名は必須です" })}
+                            {...register("subject", {
+                                required: "科目名は必須です",
+                                maxLength: { value: 50, message: "50文字以内で入力してください"}
+                            })}
                             error={!!errors.subject}
                             helperText={errors.subject?.message}
                         />
@@ -75,6 +80,7 @@ export const ProblemForm = ({ onSubmit, defaultValues, isLoading, formError, for
                                         <MenuItem key={year} value={year}>{year}年</MenuItem>
                                         ))}
                                     </Select>
+                                    { errors.year && <Typography color="error" variant="caption" sx={{ ml: 2, mt: 1}}>{errors.year.message}</Typography>}
                                 </FormControl>
                             )}
                         />
@@ -97,6 +103,7 @@ export const ProblemForm = ({ onSubmit, defaultValues, isLoading, formError, for
                                         <MenuItem key={month} value={month}>{month}月</MenuItem>
                                         ))}
                                     </Select>
+                                    { errors.month && <Typography color="error" variant="caption" sx={{ ml: 2, mt: 1}}>{errors.month.message}</Typography>}
                                 </FormControl>
                             )}
                         />
@@ -108,7 +115,10 @@ export const ProblemForm = ({ onSubmit, defaultValues, isLoading, formError, for
                             variant="outlined"
                             multiline
                             rows={5}
-                            {...register("question", { required: "問題文は必須です" })}
+                            {...register("question", {
+                                required: "問題文は必須です",
+                                maxLength: { value: 1000, message: "1000文字以内で入力してください。"}
+                            })}
                             error={!!errors.question}
                             helperText={errors.question?.message}
                         />

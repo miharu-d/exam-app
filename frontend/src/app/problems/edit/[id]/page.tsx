@@ -57,12 +57,11 @@ export default async function EditProblemPage({ params }: EditProblemPageProps) 
         revalidatePath(`/problems`);
         revalidatePath(`/problems/${problemId}`);
         
-        return { success: true, message: "問題が正常に更新されました。" };
+        return { success: true, message: "問題を変更しました。" };
     }
 
     return (
         <Container maxWidth="md" sx={{ py: 4 }}>
-        {/* 3. ハンドラーコンポーネントに、データとアクションを渡します */}
         <ProblemEditFormHandler
             problemId={problemId}
             defaultValues={problemData}

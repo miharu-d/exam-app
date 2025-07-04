@@ -41,7 +41,14 @@ export default function LoginForm() {
                         autoComplete="email"
                         autoFocus
                         variant="outlined"
-                        {...register("email", { required: "メールアドレスは必須です。"})}
+                        {...register("email", {
+                            required: "メールアドレスは必須です。",
+                            pattern: {
+                                // メールアドレスの形式をチェックする正規表現
+                                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                                message: "有効なメールアドレスを入力してください"
+                            }
+                        })}
                         error={!!errors.email}
                         helperText={errors.email?.message}
                     />
